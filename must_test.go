@@ -30,6 +30,17 @@ func TestMust(t *testing.T) {
 		return x * y, errors.New("yet another error occurred")
 	}
 
+	type testStruct struct {
+		A int
+		B string
+	}
+
+	incrementStruct := func(a testStruct) (testStruct, error) {
+		a.A++
+		a.B += "!"
+		return a, errors.New("some error!")
+	}
+
 	if Must(exampleFunc) != 42 {
 		t.Error("Must(exampleFunc) should return 42")
 	}
@@ -47,5 +58,10 @@ func TestMust(t *testing.T) {
 	}
 	if Must(funcPanic) != nil {
 		t.Error("Must(funcPanic) should return nil")
+	}
+	// structs do need to be cast
+	testStruct2 := Must(incrementStruct, testStruct{A: 41, B: "Hello"}).(testStruct)
+	if testStruct2.A != 42 {
+		t.Error("Must(incrementStruct) should return 42")
 	}
 }
